@@ -38,8 +38,11 @@ CONFIG_SHRINK_MEMORY=y
 CONFIG_PROCESS_RECLAIM=y
 
 CONFIG_KERNEL_XZ=y
+<<<<<<< HEAD
+=======
 CONFIG_RD_BZIP2=y
 CONFIG_RD_LZMA=y
+>>>>>>> 03fdcd0... Size improvements - now there should be more room for other stuff, e.g. magisk
 CONFIG_CC_OPTIMIZE_FOR_SIZE=y
 
 #
