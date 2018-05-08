@@ -18,10 +18,6 @@
 #include "reg.h"
 #include "rdev-ops.h"
 
-#ifndef MAC2STR
-#define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
-#define MACSTR "%02X:%02X:%02X:%02X:%02X:%02X \n"
-#endif
 struct cfg80211_conn {
 	struct cfg80211_connect_params params;
 	/* these are sub-states of the _CONNECTING sme_state */
@@ -333,10 +329,7 @@ static void __cfg80211_sme_scan_done(struct net_device *dev)
 void cfg80211_sme_scan_done(struct net_device *dev)
 {
 	struct wireless_dev *wdev = dev->ieee80211_ptr;
-	if(NULL == wdev)
-	{
-		return;
-	}
+
 	wdev_lock(wdev);
 	__cfg80211_sme_scan_done(dev);
 	wdev_unlock(wdev);
@@ -426,24 +419,6 @@ void cfg80211_sme_failed_assoc(struct wireless_dev *wdev)
 	schedule_work(&rdev->conn_work);
 }
 
-void bss_dump(struct wiphy *wiphy)
-{
-    if(!wiphy)
-       return;
-    struct cfg80211_registered_device *dev = wiphy_to_dev(wiphy);
-    struct cfg80211_internal_bss *bss;
-    int count = 0;
-    printk("in bss_dump\n");
-    spin_lock_bh(&dev->bss_lock);
-    list_for_each_entry(bss, &dev->bss_list, list)
-    {
-       printk(MACSTR,  MAC2STR(bss->pub.bssid));
-       count++;
-       if(count >= 100)
-          break;
-    }
-    spin_unlock_bh(&dev->bss_lock);
-}
 void __cfg80211_connect_result(struct net_device *dev, const u8 *bssid,
 			       const u8 *req_ie, size_t req_ie_len,
 			       const u8 *resp_ie, size_t resp_ie_len,
@@ -455,9 +430,7 @@ void __cfg80211_connect_result(struct net_device *dev, const u8 *bssid,
 #ifdef CONFIG_CFG80211_WEXT
 	union iwreq_data wrqu;
 #endif
-        if(bssid)
-           printk("MAC:" MACSTR, MAC2STR(bssid));
-        printk("cfg80211_connect_result status: %d\n", status);
+
 	ASSERT_WDEV_LOCK(wdev);
 
 	if (WARN_ON(wdev->iftype != NL80211_IFTYPE_STATION &&
@@ -527,13 +500,10 @@ void __cfg80211_connect_result(struct net_device *dev, const u8 *bssid,
 				       wdev->ssid, wdev->ssid_len,
 				       WLAN_CAPABILITY_ESS,
 				       WLAN_CAPABILITY_ESS);
-        printk("dump_ap info\n"); 
-        bss_dump(wdev->wiphy);
+
 	if (WARN_ON(!bss))
-        {
-	    bss_dump(wdev->wiphy);
 		return;
-        }
+
 	cfg80211_hold_bss(bss_from_pub(bss));
 	wdev->current_bss = bss_from_pub(bss);
 
@@ -725,27 +695,20 @@ void __cfg80211_disconnected(struct net_device *dev, const u8 *ie,
 			     size_t ie_len, u16 reason, bool from_ap)
 {
 	struct wireless_dev *wdev = dev->ieee80211_ptr;
-	struct cfg80211_registered_device *rdev = NULL;
+	struct cfg80211_registered_device *rdev = wiphy_to_dev(wdev->wiphy);
 	int i;
 #ifdef CONFIG_CFG80211_WEXT
 	union iwreq_data wrqu;
 #endif
-	if(NULL == wdev)
-	{
-		return;
-	}
 
 	ASSERT_WDEV_LOCK(wdev);
 
-	rdev = wiphy_to_dev(wdev->wiphy);
 	if (WARN_ON(wdev->iftype != NL80211_IFTYPE_STATION &&
 		    wdev->iftype != NL80211_IFTYPE_P2P_CLIENT))
 		return;
 
-#ifndef CONFIG_CFG80211_ALLOW_RECONNECT
 	if (wdev->sme_state != CFG80211_SME_CONNECTED)
 		return;
-#endif
 
 	if (wdev->current_bss) {
 		cfg80211_unhold_bss(wdev->current_bss);
@@ -843,14 +806,10 @@ int __cfg80211_connect(struct cfg80211_registered_device *rdev,
 
 	ASSERT_WDEV_LOCK(wdev);
 
-#ifndef CONFIG_CFG80211_ALLOW_RECONNECT
 	if (wdev->sme_state != CFG80211_SME_IDLE)
 		return -EALREADY;
 
 	if (WARN_ON(wdev->connect_keys)) {
-#else
-	if (wdev->connect_keys) {
-#endif
 		kfree(wdev->connect_keys);
 		wdev->connect_keys = NULL;
 	}

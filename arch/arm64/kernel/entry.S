@@ -698,7 +698,7 @@ ENDPROC(el0_svc)
 	 */
 __sys_trace:
 	mov	x0, sp
-	bl	syscall_trace_enter
+	bl	syscall_trace
 	adr	lr, __sys_trace_return		// return address
 	cmp	w0, #RET_SKIP_SYSCALL_TRACE	// skip syscall and tracing?
 	b.eq	ret_to_user
@@ -719,7 +719,7 @@ __sys_trace_return:
 	str	x0, [sp]			// save returned x0
 __sys_trace_return_skipped:			// x0 already in regs[0]
 	mov	x0, sp
-	bl	syscall_trace_exit
+	bl	syscall_trace
 	b	ret_to_user
 
 /*
