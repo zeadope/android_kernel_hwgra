@@ -214,6 +214,14 @@ int __cpu_disable(void)
 		return ret;
 
 	/*
+	 * Enable GIC and timers.
+	 */
+	notify_cpu_starting(cpu);
+
+	local_irq_enable();
+	local_fiq_enable();
+
+	/*
 	 * Take this CPU offline.  Once we clear this, we can't return,
 	 * and we must not schedule until we're ready to give up the cpu.
 	 */

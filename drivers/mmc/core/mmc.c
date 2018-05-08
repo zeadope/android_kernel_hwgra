@@ -181,6 +181,9 @@ static int mmc_decode_csd(struct mmc_card *card)
 /* Minimum partition switch timeout in milliseconds */
 #define MMC_MIN_PART_SWITCH_TIME	300
 
+/* Minimum partition switch timeout in milliseconds */
+#define MMC_MIN_PART_SWITCH_TIME	300
+
 /*
  * Read extended CSD.
  */

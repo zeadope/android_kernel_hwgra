@@ -109,7 +109,6 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
 		 * PPT chipsets.
 		 */
 		xhci->quirks |= XHCI_SPURIOUS_REBOOT;
-		xhci->quirks |= XHCI_AVOID_BEI;
 	}
 	if (pdev->vendor == PCI_VENDOR_ID_ETRON &&
 			pdev->device == PCI_DEVICE_ID_ASROCK_P67) {
@@ -133,7 +132,7 @@ static int xhci_pci_setup(struct usb_hcd *hcd)
 
 	retval = xhci_gen_setup(hcd, xhci_pci_quirks);
 	if (retval)
-		return retval;
+		goto put_runtime_pm;
 
 	xhci = hcd_to_xhci(hcd);
 	if (!usb_hcd_is_primary_hcd(hcd))

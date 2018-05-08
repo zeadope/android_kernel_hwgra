@@ -448,6 +448,14 @@ struct lpc_ich_info lpc_chipset_info[] = {
 		.name = "Coleto Creek",
 		.iTCO_version = 2,
 	},
+	[LPC_AVN] = {
+		.name = "Avoton SoC",
+		.iTCO_version = 1,
+	},
+	[LPC_COLETO] = {
+		.name = "Coleto Creek",
+		.iTCO_version = 2,
+	},
 };
 
 /*

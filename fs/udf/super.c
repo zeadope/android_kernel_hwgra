@@ -637,6 +637,12 @@ static int udf_remount_fs(struct super_block *sb, int *flags, char *options)
 			return -EACCES;
 	}
 
+	if (sbi->s_lvid_bh) {
+		int write_rev = le16_to_cpu(udf_sb_lvidiu(sbi)->minUDFWriteRev);
+		if (write_rev > UDF_MAX_WRITE_VERSION && !(*flags & MS_RDONLY))
+			return -EACCES;
+	}
+
 	uopt.flags = sbi->s_flags;
 	uopt.uid   = sbi->s_uid;
 	uopt.gid   = sbi->s_gid;

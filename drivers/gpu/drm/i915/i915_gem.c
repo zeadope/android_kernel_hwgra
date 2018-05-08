@@ -1609,6 +1609,10 @@ i915_gem_object_move_to_active(struct drm_i915_gem_object *obj,
 	struct drm_i915_private *dev_priv = dev->dev_private;
 
 	BUG_ON(ring == NULL);
+	if (obj->ring != ring && obj->last_write_seqno) {
+		/* Keep the seqno relative to the current ring */
+		obj->last_write_seqno = seqno;
+	}
 	obj->ring = ring;
 
 	/* Add a reference if we're newly entering the active list. */
@@ -2689,6 +2693,10 @@ i915_gem_clear_fence_reg(struct drm_device *dev,
 {
 	drm_i915_private_t *dev_priv = dev->dev_private;
 	uint32_t fence_reg = reg - dev_priv->fence_regs;
+
+	WARN(obj && (!obj->stride || !obj->tiling_mode),
+	     "bogus fence setup with stride: 0x%x, tiling mode: %i\n",
+	     obj->stride, obj->tiling_mode);
 
 	switch (INTEL_INFO(dev)->gen) {
 	case 7:

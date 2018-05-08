@@ -80,7 +80,6 @@ static int disable_wdt_flag = 0;
  * @hisi_wdt_delayed_work: kick dog work
  * @status: current status of wdt
  * @load_val: load value to be set for current timeout
- * @timeout: current programmed timeout
  */
 struct sp805_wdt {
     struct watchdog_device      wdd;

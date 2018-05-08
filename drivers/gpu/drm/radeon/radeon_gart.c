@@ -222,8 +222,10 @@ void radeon_gart_restore(struct radeon_device *rdev)
 			page_base += RADEON_GPU_PAGE_SIZE;
 		}
 	}
-	mb();
-	radeon_gart_tlb_flush(rdev);
+	if (rdev->gart.ptr) {
+		mb();
+		radeon_gart_tlb_flush(rdev);
+	}
 }
 
 int radeon_gart_init(struct radeon_device *rdev)
