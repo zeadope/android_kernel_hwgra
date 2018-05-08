@@ -1,0 +1,8 @@
+--- arch/x86/crypto/serpent_avx_glue.c
++++ arch/x86/crypto/serpent_avx_glue.c
+@@ -617,4 +617,4 @@ module_exit(serpent_exit);
+ 
+ MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX optimized");
+ MODULE_LICENSE("GPL");
+-MODULE_ALIAS("serpent");
++MODULE_ALIAS_CRYPTO("serpent");

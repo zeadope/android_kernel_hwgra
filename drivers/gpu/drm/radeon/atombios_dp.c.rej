@@ -1,0 +1,34 @@
+--- drivers/gpu/drm/radeon/atombios_dp.c
++++ drivers/gpu/drm/radeon/atombios_dp.c
+@@ -100,10 +135,10 @@ static int radeon_process_aux_ch(struct radeon_i2c_chan *chan,
+ 
+ 	base = (unsigned char *)(rdev->mode_info.atom_context->scratch + 1);
+ 
+-	memcpy(base, send, send_bytes);
++	radeon_atom_copy_swap(base, send, send_bytes, true);
+ 
+-	args.v1.lpAuxRequest = 0 + 4;
+-	args.v1.lpDataOut = 16 + 4;
++	args.v1.lpAuxRequest = cpu_to_le16((u16)(0 + 4));
++	args.v1.lpDataOut = cpu_to_le16((u16)(16 + 4));
+ 	args.v1.ucDataOutLen = 0;
+ 	args.v1.ucChannelID = chan->rec.i2c_id;
+ 	args.v1.ucDelay = delay / 10;
+@@ -406,7 +454,7 @@ static int radeon_dp_get_dp_lane_number(struct drm_connector *connector,
+ 					int pix_clock)
+ {
+ 	int bpp = convert_bpc_to_bpp(radeon_get_monitor_bpc(connector));
+-	int max_link_rate = drm_dp_max_link_rate(dpcd);
++	int max_link_rate = radeon_dp_get_max_link_rate(connector, dpcd);
+ 	int max_lane_num = drm_dp_max_lane_count(dpcd);
+ 	int lane_num;
+ 	int max_dp_pix_clock;
+@@ -444,7 +492,7 @@ static int radeon_dp_get_dp_link_clock(struct drm_connector *connector,
+ 			return 540000;
+ 	}
+ 
+-	return drm_dp_max_link_rate(dpcd);
++	return radeon_dp_get_max_link_rate(connector, dpcd);
+ }
+ 
+ static u8 radeon_dp_encoder_service(struct radeon_device *rdev,

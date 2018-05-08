@@ -1,0 +1,11 @@
+--- arch/um/os-Linux/start_up.c
++++ arch/um/os-Linux/start_up.c
+@@ -95,6 +95,8 @@ static int start_ptraced_child(void)
+ {
+ 	int pid, n, status;
+ 
++	fflush(stdout);
++
+ 	pid = fork();
+ 	if (pid == 0)
+ 		ptrace_child();

@@ -1,0 +1,44 @@
+--- drivers/net/wireless/rtlwifi/usb.c
++++ drivers/net/wireless/rtlwifi/usb.c
+@@ -550,7 +552,7 @@ static void _rtl_rx_pre_process(struct ieee80211_hw *hw, struct sk_buff *skb)
+ 	}
+ }
+ 
+-#define __RX_SKB_MAX_QUEUED	32
++#define __RX_SKB_MAX_QUEUED	64
+ 
+ static void _rtl_rx_work(unsigned long param)
+ {
+@@ -831,6 +834,23 @@ static void rtl_usb_stop(struct ieee80211_hw *hw)
+ 	/* Enable software */
+ 	SET_USB_STOP(rtlusb);
+ 	rtl_usb_deinit(hw);
++
++	/* free pre-allocated URBs from rtl_usb_start() */
++	usb_kill_anchored_urbs(&rtlusb->rx_submitted);
++
++	tasklet_kill(&rtlusb->rx_work_tasklet);
++	cancel_work_sync(&rtlpriv->works.lps_change_work);
++
++	flush_workqueue(rtlpriv->works.rtl_wq);
++
++	skb_queue_purge(&rtlusb->rx_queue);
++
++	while ((urb = usb_get_from_anchor(&rtlusb->rx_cleanup_urbs))) {
++		usb_free_coherent(urb->dev, urb->transfer_buffer_length,
++				urb->transfer_buffer, urb->transfer_dma);
++		usb_free_urb(urb);
++	}
++
+ 	rtlpriv->cfg->ops->hw_disable(hw);
+ }
+ 
+@@ -1073,6 +1093,8 @@ int rtl_usb_probe(struct usb_interface *intf,
+ 	spin_lock_init(&rtlpriv->locks.usb_lock);
+ 	INIT_WORK(&rtlpriv->works.fill_h2c_cmd,
+ 		  rtl_fill_h2c_cmd_work_callback);
++	INIT_WORK(&rtlpriv->works.lps_change_work,
++		  rtl_lps_change_work_callback);
+ 
+ 	rtlpriv->usb_data_index = 0;
+ 	init_completion(&rtlpriv->firmware_loading_complete);

@@ -1,0 +1,23 @@
+--- drivers/gpu/drm/radeon/radeon_atpx_handler.c
++++ drivers/gpu/drm/radeon/radeon_atpx_handler.c
+@@ -216,7 +217,8 @@ static int radeon_atpx_verify_interface(struct radeon_atpx *atpx)
+ 	memcpy(&output, info->buffer.pointer, size);
+ 
+ 	/* TODO: check version? */
+-	printk("ATPX version %u\n", output.version);
++	printk("ATPX version %u, functions 0x%08x\n",
++	       output.version, output.function_bits);
+ 
+ 	radeon_atpx_parse_functions(&atpx->functions, output.function_bits);
+ 
+@@ -252,6 +254,10 @@ static int radeon_atpx_set_discrete_state(struct radeon_atpx *atpx, u8 state)
+ 		if (!info)
+ 			return -EIO;
+ 		kfree(info);
++
++		/* 200ms delay is required after off */
++		if (state == 0)
++			msleep(200);
+ 	}
+ 	return 0;
+ }

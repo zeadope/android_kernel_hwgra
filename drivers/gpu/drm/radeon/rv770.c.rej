@@ -1,0 +1,54 @@
+--- drivers/gpu/drm/radeon/rv770.c
++++ drivers/gpu/drm/radeon/rv770.c
+@@ -744,10 +744,10 @@ static void rv770_init_golden_registers(struct radeon_device *rdev)
+ 						 (const u32)ARRAY_SIZE(r7xx_golden_dyn_gpr_registers));
+ 		radeon_program_register_sequence(rdev,
+ 						 rv730_golden_registers,
+-						 (const u32)ARRAY_SIZE(rv770_golden_registers));
++						 (const u32)ARRAY_SIZE(rv730_golden_registers));
+ 		radeon_program_register_sequence(rdev,
+ 						 rv730_mgcg_init,
+-						 (const u32)ARRAY_SIZE(rv770_mgcg_init));
++						 (const u32)ARRAY_SIZE(rv730_mgcg_init));
+ 		break;
+ 	case CHIP_RV710:
+ 		radeon_program_register_sequence(rdev,
+@@ -758,18 +758,18 @@ static void rv770_init_golden_registers(struct radeon_device *rdev)
+ 						 (const u32)ARRAY_SIZE(r7xx_golden_dyn_gpr_registers));
+ 		radeon_program_register_sequence(rdev,
+ 						 rv710_golden_registers,
+-						 (const u32)ARRAY_SIZE(rv770_golden_registers));
++						 (const u32)ARRAY_SIZE(rv710_golden_registers));
+ 		radeon_program_register_sequence(rdev,
+ 						 rv710_mgcg_init,
+-						 (const u32)ARRAY_SIZE(rv770_mgcg_init));
++						 (const u32)ARRAY_SIZE(rv710_mgcg_init));
+ 		break;
+ 	case CHIP_RV740:
+ 		radeon_program_register_sequence(rdev,
+ 						 rv740_golden_registers,
+-						 (const u32)ARRAY_SIZE(rv770_golden_registers));
++						 (const u32)ARRAY_SIZE(rv740_golden_registers));
+ 		radeon_program_register_sequence(rdev,
+ 						 rv740_mgcg_init,
+-						 (const u32)ARRAY_SIZE(rv770_mgcg_init));
++						 (const u32)ARRAY_SIZE(rv740_mgcg_init));
+ 		break;
+ 	default:
+ 		break;
+@@ -1984,6 +1985,7 @@ int rv770_resume(struct radeon_device *rdev)
+ int rv770_suspend(struct radeon_device *rdev)
+ {
+ 	r600_audio_fini(rdev);
++	r600_uvd_stop(rdev);
+ 	radeon_uvd_suspend(rdev);
+ 	r700_cp_stop(rdev);
+ 	r600_dma_stop(rdev);
+@@ -2099,6 +2101,7 @@ void rv770_fini(struct radeon_device *rdev)
+ 	radeon_ib_pool_fini(rdev);
+ 	radeon_irq_kms_fini(rdev);
+ 	rv770_pcie_gart_fini(rdev);
++	r600_uvd_stop(rdev);
+ 	radeon_uvd_fini(rdev);
+ 	r600_vram_scratch_fini(rdev);
+ 	radeon_gem_fini(rdev);

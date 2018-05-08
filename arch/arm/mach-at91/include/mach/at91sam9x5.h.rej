@@ -1,0 +1,14 @@
+--- arch/arm/mach-at91/include/mach/at91sam9x5.h
++++ arch/arm/mach-at91/include/mach/at91sam9x5.h
+@@ -54,6 +54,11 @@
+ #define AT91SAM9X5_BASE_USART1	0xf8020000
+ #define AT91SAM9X5_BASE_USART2	0xf8024000
+ 
++/*
++ * System Peripherals
++ */
++#define AT91SAM9X5_BASE_RTC	0xfffffeb0
++
+ /*
+  * Internal Memory.
+  */

@@ -1,0 +1,11 @@
+--- drivers/gpu/drm/vmwgfx/vmwgfx_fb.c
++++ drivers/gpu/drm/vmwgfx/vmwgfx_fb.c
+@@ -162,6 +162,8 @@ static int vmw_fb_set_par(struct fb_info *info)
+ 	struct vmw_private *vmw_priv = par->vmw_priv;
+ 	int ret;
+ 
++	info->fix.line_length = info->var.xres * info->var.bits_per_pixel/8;
++
+ 	ret = vmw_kms_write_svga(vmw_priv, info->var.xres, info->var.yres,
+ 				 info->fix.line_length,
+ 				 par->bpp, par->depth);

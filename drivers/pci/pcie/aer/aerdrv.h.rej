@@ -1,0 +1,10 @@
+--- drivers/pci/pcie/aer/aerdrv.h
++++ drivers/pci/pcie/aer/aerdrv.h
+@@ -76,7 +76,6 @@ struct aer_rpc {
+ 					 * recovery on the same
+ 					 * root port hierarchy
+ 					 */
+-	wait_queue_head_t wait_release;
+ };
+ 
+ struct aer_broadcast_data {
